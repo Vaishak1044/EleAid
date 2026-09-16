@@ -1,0 +1,11 @@
+numpy>=1.24
+scipy>=1.10
+scikit-learn>=1.3
+joblib>=1.3
+sounddevice>=0.4.6
+matplotlib>=3.7
+pydub>=0.25
+
+# Linux/Raspberry Pi additionally needs PortAudio, Tk, and (for MP3 files)
+# ffmpeg installed by the operating system. Windows users need Python and a
+# working microphone driver.

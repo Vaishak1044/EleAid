@@ -1,0 +1,3 @@
+# The application loads BirdNET acoustic 2.4 with the tf or pb backend.
+# Those backends require the TensorFlow extra, not just the base birdnet wheel.
+birdnet[tf]>=1.1

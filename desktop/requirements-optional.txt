@@ -1,0 +1,8 @@
+# Optional model backends:
+librosa>=0.10
+birdnet[tf]>=1.1
+tensorflow>=2.15
+tensorflow-hub>=0.16
+tf-keras>=2.15
+tflite-runtime>=2.14
+pyserial>=3.5

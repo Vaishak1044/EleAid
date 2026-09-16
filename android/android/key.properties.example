@@ -1,0 +1,6 @@
+# Copy this file to android/key.properties and replace every value.
+# Never commit key.properties or the .jks file to a public repository.
+storePassword=CHANGE_ME
+keyPassword=CHANGE_ME
+keyAlias=eleaid-upload
+storeFile=eleaid-upload-key.jks

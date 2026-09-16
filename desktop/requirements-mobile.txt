@@ -1,0 +1,8 @@
+# EfficientNet-Lite0 Mobile CNN/TFLite training and inference
+librosa>=0.10
+tensorflow>=2.15
+tensorflow-hub>=0.16
+tf-keras>=2.15
+
+# Optional when TensorFlow's bundled tf.lite.Interpreter is unavailable:
+# tflite-runtime>=2.14

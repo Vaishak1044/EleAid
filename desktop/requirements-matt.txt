@@ -1,0 +1,8 @@
+librosa>=0.10
+tensorflow>=2.15
+
+# Required for EfficientNet-Lite0 Mobile CNN/TFLite training:
+tensorflow-hub>=0.16
+
+# Optional when TensorFlow's bundled tf.lite.Interpreter is available:
+# tflite-runtime>=2.14
