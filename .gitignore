@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Generated classifier state
+desktop/data/
+data/
+*.joblib
+*.tflite
+*.wav
+*.mp3
+android/assets/*labels*.txt
+
+# Secrets and local configuration
+.env
+server/.env
+*.pem
+*.p12
+*.pfx
+credentials*.json
+secrets*.json
+
+# Flutter
+android/.dart_tool/
+android/build/
+android/.flutter-plugins
+android/.flutter-plugins-dependencies
+android/.packages
+android/android/.gradle/
+android/android/local.properties
+android/android/app/build/
+android/key.properties
+android/*.jks
+android/*.keystore
+android/android/key.properties
+android/android/*.jks
+android/android/*.keystore
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
