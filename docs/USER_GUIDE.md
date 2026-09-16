@@ -58,10 +58,11 @@ docs/                    Documentation
 ```
 
 Run commands from the repository root unless a command first changes directory.
-On Windows, the repository root in the examples is:
+In the examples below, `<REPO_ROOT>` means the folder where you cloned or
+extracted EleAid. It can be anywhere on your computer.
 
 ```text
-D:\Projects\EleAid\Codex version of EleAid
+<REPO_ROOT>
 ```
 
 ## 4. Windows installation
@@ -84,7 +85,7 @@ Do not start the Python application before installing its dependencies.
 Open PowerShell in the repository root:
 
 ```powershell
-cd "D:\Projects\EleAid\Codex version of EleAid"
+cd "<REPO_ROOT>"
 py -3 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
@@ -617,7 +618,7 @@ If the application has never been published, create a new upload keystore from
 PowerShell:
 
 ```powershell
-cd "D:\Projects\EleAid\Codex version of EleAid\android\android"
+cd "<REPO_ROOT>\android\android"
 keytool -genkeypair -v `
   -keystore eleaid-upload-key.jks `
   -alias eleaid-upload `
@@ -824,13 +825,13 @@ android/assets/efficientnet_lite0_mobile_labels.txt
 Create the keystore in the same directory expected by `key.properties`:
 
 ```text
-D:\Projects\EleAid\Codex version of EleAid\android\android\eleaid-upload-key.jks
+<REPO_ROOT>\android\android\eleaid-upload-key.jks
 ```
 
 Confirm:
 
 ```powershell
-cd "D:\Projects\EleAid\Codex version of EleAid\android\android"
+cd "<REPO_ROOT>\android\android"
 Test-Path .\eleaid-upload-key.jks
 ```
 
