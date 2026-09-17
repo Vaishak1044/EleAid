@@ -14,6 +14,25 @@ Android uses only the exported EfficientNet-Lite0 TFLite model. Tkinter, scikit-
 For complete Windows, Raspberry Pi, FFmpeg, optional-model, Android, signing,
 and troubleshooting instructions, read [docs/USER_GUIDE.md](docs/USER_GUIDE.md).
 
+### Public release package (Track 1)
+
+The lightweight Windows installer contains the desktop executable, published
+default desktop models, the bundled BirdNET acoustic model, FFmpeg for WAV/MP3
+import, and the documentation. It installs per-user under
+`%LOCALAPPDATA%\EleAid`, so it does not need administrator rights.
+
+It intentionally does **not** contain the multi-gigabyte Android build
+toolchain: Flutter SDK, JDK 17, Android SDK/build-tools, Gradle distribution,
+or the Flutter package cache. Android APK creation therefore requires the
+one-time manual setup in [the Android guide](docs/USER_GUIDE.md#13-android-prerequisites-and-dependency-installation).
+The Android project and TFLite model are kept as repository/release assets and
+are copied into `android/assets/` by the desktop Build APK button.
+
+Run `EleAid_Lightweight_Installer.exe`, accept the default per-user install,
+and launch the desktop shortcut. If you only download `EleAid_Desktop.exe`,
+also copy its companion `desktop/` and `tools/` folders; the installer is the
+recommended distribution format.
+
 ### Raspberry Pi or Windows desktop
 
 ```text
@@ -67,6 +86,8 @@ server/     FastAPI inference service used by Android
 android/    Flutter Android companion client
 models/     Public model packaging notes; trained artifacts stay out of Git
 docs/       Complete installation, training, deployment, and troubleshooting guide
+installer/  Lightweight Windows installer builder and package setup scripts
+release_models/ Validated default model and optional FFmpeg inputs for releases
 ```
 
 Do not commit phone numbers, SIM credentials, ThingsBoard access tokens, datasets containing personal information, or trained model artifacts unless you have explicitly chosen to publish them.

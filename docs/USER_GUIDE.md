@@ -3,6 +3,47 @@
 This guide describes the verified EleAid workflow for Windows, Raspberry Pi OS,
 and Android. Read the platform section for the device on which you are working.
 
+## 0. Choose the distribution track
+
+### Track 1: lightweight public package (available now)
+
+The Windows installer is designed to stay well below the size of a complete
+Android development environment. It contains:
+
+- the frozen desktop application and its Python runtime;
+- the validated default desktop model artifacts;
+- the bundled BirdNET acoustic model used by BirdNET train/deploy;
+- prebuilt FFmpeg binaries for WAV/MP3 import;
+- the README, this guide, license, and third-party notice reminder.
+
+It installs per-user to `%LOCALAPPDATA%\EleAid` and creates a desktop shortcut.
+The desktop application can record, import, train, monitor, send SIM7600 SMS,
+and upload ThingsBoard telemetry without Python being installed separately.
+
+The following are deliberately **not** bundled because they are large
+developer toolchains or user-specific build material:
+
+- Flutter SDK;
+- JDK 17;
+- Android SDK platform-tools, platform, and build-tools;
+- the Gradle distribution and Gradle/Flutter caches;
+- the Android signing keystore and `key.properties`;
+- private recordings, credentials, phone numbers, and ThingsBoard tokens.
+
+Follow Section 13 to install the Android toolchain once on the build computer.
+The repository contains the Android project; the desktop Build APK button uses
+that project after Flutter and its dependencies are available. The trained
+EfficientNet-Lite0 TFLite model is copied into `android/assets/` during the
+build. Android supports only that model.
+
+### Track 2: self-sufficient offline installer (not started)
+
+A fully offline installer would need to ship Flutter, JDK, Android SDK,
+build-tools, Gradle, cached Flutter packages, the Android project, and model
+assets. It would be several gigabytes and would need a separate build and
+validation cycle. Track 2 has not been started; it will only be built after
+the project owner explicitly authorizes it.
+
 ## 1. What the project does
 
 EleAid has three related parts:
@@ -199,7 +240,29 @@ winget install "FFmpeg (Essentials Build)"
 The FFmpeg warning is mainly relevant to MP3 import/conversion. WAV recording
 and WAV-only workflows may continue without it.
 
-### 4.5 Start the Windows desktop app
+### 4.5 Install the lightweight Windows package
+
+For non-technical users, run `EleAid_Lightweight_Installer.exe` and keep the
+default destination. The installer creates:
+
+```text
+%LOCALAPPDATA%\EleAid\EleAid_Desktop.exe
+%LOCALAPPDATA%\EleAid\desktop\data\models\
+%LOCALAPPDATA%\EleAid\desktop\data\birdnet\
+%LOCALAPPDATA%\EleAid\tools\ffmpeg\ffmpeg.exe
+%LOCALAPPDATA%\EleAid\tools\ffmpeg\ffprobe.exe
+```
+
+It also creates a desktop shortcut and launches the application. The packaged
+FFmpeg is selected automatically by the application; no PATH editing is
+needed for the installer version. Keep the complete installed folder together
+if it is copied to another machine. The application writes recordings and
+newly trained models under the installed `desktop\data\` folder.
+
+The installer does not install Flutter or Android build tools. Those are only
+needed on a computer that will create APKs, as described in Section 13.
+
+### 4.6 Start the Windows desktop app
 
 From the repository root, with `.venv` activated:
 
@@ -557,6 +620,106 @@ checked-in Android project files. Do not manually copy `.aar`, LiteRT, or Tensor
 libraries into the project. Run `flutter pub get` after cloning or after
 changing `pubspec.yaml`.
 
+### 13.1 Install JDK 17 and select it
+
+Install a 64-bit JDK 17. Android Studio includes a compatible runtime in many
+installations. In PowerShell, verify or select it before running Flutter:
+
+```powershell
+$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
+$env:Path = "$env:JAVA_HOME\bin;$env:Path"
+java -version
+```
+
+To make the setting persistent for your Windows user, set `JAVA_HOME` in
+**Environment Variables** to the JDK folder (not its `bin` folder), then add
+`%JAVA_HOME%\bin` to the user `Path`. Reopen PowerShell afterward.
+
+### 13.2 Install Flutter and resolve Dart packages
+
+Install the Flutter stable SDK, for example under `C:\src\flutter`, then add
+`C:\src\flutter\bin` to the user `Path`. From the repository root run:
+
+```powershell
+flutter --version
+cd android
+flutter doctor -v
+flutter pub get
+flutter pub deps
+```
+
+`flutter pub get` resolves the packages in `android\pubspec.yaml` and creates
+the local `.dart_tool` package graph. The important packages are `archive`,
+`http`, `path_provider`, `record`, `share_plus`, `shared_preferences`, and
+`tflite_flutter`. Do not copy a package cache from another machine. If a
+dependency-resolution error occurs, run `flutter pub get -v` in `android` and
+keep the complete error output.
+
+### 13.3 Install Android SDK components
+
+Use Android Studio **SDK Manager** or the command-line `sdkmanager`. Install
+the Android SDK platform and build-tools version reported as required by
+`flutter doctor -v`, plus platform-tools and command-line tools. Then accept
+licenses:
+
+```powershell
+flutter doctor --android-licenses
+flutter doctor -v
+```
+
+If using command-line tools, set the SDK location to your actual folder, for
+example:
+
+```powershell
+$env:ANDROID_SDK_ROOT = "$env:LOCALAPPDATA\Android\Sdk"
+$env:Path = "$env:ANDROID_SDK_ROOT\platform-tools;$env:ANDROID_SDK_ROOT\cmdline-tools\latest\bin;$env:Path"
+sdkmanager --licenses
+```
+
+The project obtains `compileSdk` and `ndkVersion` from Flutter’s configured
+toolchain. Install the versions named by `flutter doctor` rather than guessing
+an SDK version. A physical phone also needs USB debugging enabled and its
+Windows USB driver, if applicable.
+
+### 13.4 Gradle distribution and Android project
+
+The Android project contains its Gradle wrapper. At the time of this release
+it requests Gradle `9.3.1`, Android Gradle Plugin `9.1.0`, and Kotlin plugin
+`2.4.0`. Do not install Gradle globally or manually download a second copy.
+The first build downloads the wrapper distribution into the user Gradle cache;
+this cache is intentionally excluded from the public installer.
+
+Keep the repository’s complete `android` folder, including `pubspec.yaml`,
+`lib`, `assets`, and `android`. From the repository root, the desktop app
+expects it at `<REPO_ROOT>\android`. If using the installed desktop EXE, either
+run it from a repository checkout or point it to the checkout with
+`ELEAID_ANDROID_DIR`:
+
+```powershell
+$env:ELEAID_ANDROID_DIR = "<REPO_ROOT>\android"
+& "$env:LOCALAPPDATA\EleAid\EleAid_Desktop.exe"
+```
+
+The variable must point to the Android project folder containing
+`pubspec.yaml`. The safest route for APK builders is to use the repository
+checkout’s desktop application, so the Android project and generated build
+files share one root.
+
+### 13.5 TFLite model asset
+
+Android uses only these two generated assets:
+
+```text
+android\assets\efficientnet_lite0_mobile_model.tflite
+android\assets\efficientnet_lite0_mobile_labels.txt
+```
+
+Train **EfficientNet-Lite0 Mobile CNN/TFLite** on Windows or Raspberry Pi with
+48,000 Hz and a 3-second window. The desktop Build APK button copies the model
+and labels from the deployed desktop artifact into `android\assets`; it does
+not train on Android. A `.joblib`, BirdNET model, Random Forest, SVM, or Matt
+Logic model cannot be substituted for these assets.
+
 If `flutter doctor -v` reports a missing Android SDK, accept the licenses and
 install the missing SDK components through Android Studio’s SDK Manager. If a
 phone is not listed by `flutter devices`, enable Developer Options and USB
@@ -886,3 +1049,38 @@ Before publishing the repository or an APK:
    inference, ThingsBoard, and the selected SMS behavior.
 7. Test desktop monitoring separately on one Windows system and one Raspberry
    Pi before field deployment.
+
+## 18. Publish the project on GitHub
+
+Keep the source repository and large downloadable release artifacts separate:
+
+1. Review `git status --short --ignored` and inspect every file that will be
+   committed.
+2. Commit the source, Android project, `README.md`, `docs/`, `installer/`, and
+   only model files you have permission to redistribute. Keep the large FFmpeg
+   binaries out of Git history; place them only in the installer release asset.
+3. Do not commit `.venv`, `.build`, `build`, `dist`, APKs, executable build
+   output, keystores, `key.properties`, tokens, phone numbers, or private
+   recordings. The repository `.gitignore` protects the normal generated and
+   secret paths; still review the diff manually.
+4. Build the lightweight installer from the repository root:
+
+   ```powershell
+   .\build_windows_exe.ps1
+   .\installer\build_lightweight_installer.ps1
+   ```
+
+   The builder requires the prebuilt files
+   `release_models\tools\ffmpeg\ffmpeg.exe` and `ffprobe.exe`, the bundled
+   BirdNET model, and the default desktop model artifacts.
+5. Upload `EleAid_Lightweight_Installer.exe` as a GitHub **Release asset**,
+   not as a normal source file. Upload the Play APK or Android App Bundle as a
+   release asset only after checking its signing and privacy/policy status.
+6. Publish the SHA-256 values shown by `Get-FileHash` beside the release
+   assets so users can verify downloads.
+
+The lightweight installer does not provide a zero-setup Android build. Users
+who only want to run the desktop app need only the installer. Users who want
+to build APKs must install the Android prerequisites in Section 13. The fully
+self-sufficient offline installer is a separate future Track 2 project and has
+not been started.

@@ -14,6 +14,29 @@ data/
 *.mp3
 android/assets/*labels*.txt
 
+# Local build output; publish these as GitHub Release assets, not source files
+.build/
+build/
+dist/
+*.exe
+*.apk
+
+# Intentionally published release inputs (review licenses and contents first)
+!release_models/
+!release_models/README.md
+!release_models/desktop/
+!release_models/desktop/*.joblib
+!release_models/desktop/*.tflite
+!release_models/desktop/*labels*.txt
+!release_models/android/
+!release_models/android/*.tflite
+!release_models/android/*labels*.txt
+!release_models/samples/
+!release_models/samples/*.wav
+!release_models/tools/
+!release_models/tools/ffmpeg/
+release_models/tools/ffmpeg/*.exe
+
 # Secrets and local configuration
 .env
 server/.env

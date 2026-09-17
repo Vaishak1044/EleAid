@@ -1,0 +1,9 @@
+EleAid lightweight Windows package
+
+This package may contain FFmpeg binaries in tools\ffmpeg. Keep the license
+and notice files supplied by the FFmpeg binary distributor with those files.
+Before publishing a release, replace this reminder with the exact FFmpeg
+license/notice text and confirm whether the selected build is LGPL or GPL.
+
+The BirdNET model and TensorFlow components are third-party material. Review
+their upstream licenses and model-use terms before redistributing them.
